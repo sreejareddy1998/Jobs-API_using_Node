@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const bcrypt = require("bcryptjs");
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -20,8 +20,11 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, "please provide password"],
     minlength: 6,
-    maxlength: 12,
   },
 });
 
+UserSchema.pre("save", async function () {
+  const salt = await bcrypt.genSalt(10); // 10 means how mnay random bites will get bigger the number more bites will get , more secure password is going to be , if more we have there is also more processing power
+  this.password = await bcrypt.hash(this.password, salt);
+});
 module.exports = mongoose.model("User", UserSchema);
